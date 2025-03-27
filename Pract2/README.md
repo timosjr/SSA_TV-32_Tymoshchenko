@@ -284,3 +284,78 @@ int main() {
 Для визначення адрези стека у даний момент зкомпілюємо та запустимо програму. Програма дає можливість порівняти початкову та кінцеву адреси вершини стека.
 
 ![](task3/task3_3.png)
+
+# Завдання 2.4
+
+## Умова
+
+Ознайомтеся з виводом gstack і порівняйте його з GDB.
+
+## Код
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+
+#define MSG &quot;In function %20s; &amp;localvar = %p\n&quot;
+
+static void bar_is_now_closed(void) {
+    int localvar = 5;
+    printf(MSG, __FUNCTION__, &localvar);
+    printf("\n Now blocking on pause()...\n");
+
+    pause();
+}
+
+static void bar(void) {
+    int localvar = 5;
+    printf(MSG, __FUNCTION__, &localvar);
+    bar_is_now_closed();
+}
+
+static void foo(void) {
+    int localvar = 5;
+    printf(MSG, __FUNCTION__, &localvar);
+    bar();
+}
+
+int main(int argc, char **argv) {
+    int localvar = 5;
+    printf(MSG, __FUNCTION__, &localvar);
+    foo();
+    exit(EXIT_SUCCESS);
+}
+```
+
+## Виконання
+
+Оскільки у FreeBSD немає gstack, використаємо аналог procstat.
+
+Даний код переписали, зкомпілювали та запустили у фоновому режимі за допомогою `&`:
+
+```bash
+./task4 &
+```
+
+Далі за допомогою команди
+
+```bash
+pgrep task4
+```
+
+дізнались PID процесу. Тепер перейдемо до procstat та GDB.
+
+Для GDB використаємо команди
+
+```bash
+gdb -p <PID>
+bt
+```
+
+### Вивід після першої команди
+![](task4/task4_1.png)
+
+### Вивід після другої команди
+![](task4/task4_2.png)
