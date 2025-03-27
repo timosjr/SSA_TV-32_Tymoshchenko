@@ -91,7 +91,7 @@ readelf -l task1_32 | less
 
 ## Код до пункту 1
 
-```с
+```c
 #include <stdio.h>
 
 int main() {
@@ -116,7 +116,7 @@ size task2_1         # Перевіряємо розмір сегментів
 
 ## Код до пункту 2
 
-```с
+```c
 #include <stdio.h>
 
 int arr[1000];
