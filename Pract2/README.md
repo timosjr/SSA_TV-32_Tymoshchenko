@@ -213,10 +213,11 @@ int main() {
 Скомпілюйте й запустіть тестову програму, щоб визначити приблизне розташування стека у вашій системі:
 
 ```c
-#include &lt;stdio.h&gt;
+#include <stdio.h>
+
 int main() {
-int i;
-printf(&quot;The stack top is near %p\n&quot;, &amp;i);
+    int i;
+    printf("The stack top is near %p\n", %i);
 return 0;
 }
 ```
@@ -229,3 +230,57 @@ return 0;
 Спочатку було переписано, скомпільовано та запущено надану програму:
 
 ![](task3/task3_1.png)
+
+## Код з оголошеними змінними
+
+'''с
+#include <stdio.h>
+#include <stdlib.h>
+
+int global_var = 42;  // Потрапляє в сегмент .data
+int uninitialized_var; // Потрапляє в сегмент .bss
+
+void function() {} // Потрапляє в сегмент .text
+
+int main() {
+    int local_var = 123;  // У стеку
+    int *heap_var = (int*) malloc(sizeof(int)); // У купі (heap)
+
+    printf("Address of function (text segment): %p\n", function);
+    printf("Address of initialized global variable (.data): %p\n", &global_var);
+    printf("Address of uninitialized global variable (.bss): %p\n", &uninitialized_var);
+    printf("Address of heap variable (heap): %p\n", heap_var);
+    printf("Address of local variable (stack): %p\n", &local_var);
+
+    free(heap_var);
+    return 0;
+}
+'''
+
+В цій програмі оголошуються ініціалізована змінна, що потрапляє у сегмент `.data`, неініціалізована змінна, що потрапляє у сегмент `.bss`, та функція, що потрапляє у сегмент `.text`.
+
+### Виконання програми:
+
+![](task3/task3_1.png)
+
+
+## Код зі збільшеним розміром стека шляхом викликаня функції та оголошенням локальної змінної
+
+```c
+#include <stdio.h>
+
+void deep_function() {
+    int large_array[10000];  // Великий масив
+    printf("New stack top is near %p\n", &large_array[0]);
+}
+
+int main() {
+    int local_var = 1;
+    printf("Original stack top is near %p\n", &local_var);
+    deep_function();
+    return 0;
+}
+```
+Для визначення адрези стека у даний момент зкомпілюємо та запустимо програму. Програма дає можливість порівняти початкову та кінцеву адреси вершини стека.
+
+![](task3_3.png)
