@@ -304,6 +304,86 @@ int main() {
 
 ## Виконання
 
+### Код програми
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+#define MAX_FILE_SIZE 1048576 // Максимальний розмір файлу (1 МБ)
+
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        printf("Program need two arguments\n");
+        return 1;
+    }
+
+    const char *source_file = argv[1];
+    const char *dest_file = argv[2];
+
+    struct stat file_stat;
+    if (stat(source_file, &file_stat) != 0) {
+        printf("Cannot open file %s for reading\n", source_file);
+        return 1;
+    }
+
+    if (file_stat.st_size > MAX_FILE_SIZE) {
+        printf("File %s exceeds the maximum allowed size\n", source_file);
+        return 1;
+    }
+
+    FILE *src = fopen(source_file, "rb");
+    if (!src) {
+        printf("Cannot open file %s for reading\n", source_file);
+        return 1;
+    }
+
+    FILE *dest = fopen(dest_file, "wb");
+    if (!dest) {
+        printf("Cannot open file %s for writing\n", dest_file);
+        fclose(src);
+        return 1;
+    }
+
+    char buffer[4096];
+    size_t bytes;
+    while ((bytes = fread(buffer, 1, sizeof(buffer), src)) > 0) {
+        if (fwrite(buffer, 1, bytes, dest) != bytes) {
+            printf("Error writing to file %s\n", dest_file);
+            fclose(src);
+            fclose(dest);
+            return 1;
+        }
+    }
+
+    fclose(src);
+    fclose(dest);
+    printf("File copied successfully!\n");
+    return 0;
+}
+```
+
+Програма копіює вміст одного файлу в інший, виконуючи необхідні перевірки. Спочатку вона перевіряє, чи було передано рівно два аргументи — імена вхідного та вихідного файлів. Якщо аргументів недостатньо або занадто багато, виводиться повідомлення "Program need two arguments", і програма завершується. Далі вона перевіряє доступність вихідного файлу для читання за допомогою stat(). Якщо файл не існує або недоступний, виводиться повідомлення "Cannot open file ... for reading".
+
+Перед початком копіювання програма також перевіряє розмір вихідного файлу. Якщо його розмір перевищує встановлений ліміт (1 МБ), виводиться повідомлення "File ... exceeds the maximum allowed size", і програма завершує роботу. Далі здійснюється перевірка можливості запису у вихідний файл, використовуючи fopen(). Якщо файл не вдається відкрити для запису, програма повідомляє про це рядком "Cannot open file ... for writing", закриває відкриті файли (якщо потрібно) і припиняє виконання.
+
+Якщо всі перевірки пройдено успішно, починається процес копіювання. Вхідний файл читається блоками по 4096 байтів, які записуються у вихідний файл. Якщо під час запису виникає помилка, програма виводить "Error writing to file ...", закриває файли та завершує роботу. Якщо копіювання завершилося без помилок, файли закриваються, і програма виводить повідомлення "File copied successfully!".
+
+### Вхідний файл
+
+![](task5/task5_file_source.png)
+
+### Результат виконання програми
+
+![](task5/task5.png)
+
+### Вихідний файл
+
+1[](task5/task5_file_destination.png)
+
 # Завдання 6
 
 ## Умова
