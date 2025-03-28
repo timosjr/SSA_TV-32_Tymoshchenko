@@ -74,6 +74,24 @@ done
 
 ```
 
+Спочатку встановлюємо сам `perf`:
+
+```bash
+apt install -y linux-tools-common linux-tools-generic linux-tools-$(uname -r)
+```
+
+Потім потрібно написати скрипт у файл `task2.sh`. Після цього за допомогою команди
+
+```bash
+nohup ./task2.sh &
+```
+
+запускаємо скрипт у фоновому режимі. Після цього вводимо команду 
+
+```bash
+perf top -p $(pgrep -d','-f task2.sh)
+```
+
 ### Результат використання команди `perf top`
 
 ![](task2/task2.png)
