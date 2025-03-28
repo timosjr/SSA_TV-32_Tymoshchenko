@@ -392,6 +392,37 @@ int main(int argc, char *argv[]) {
 
 ## Виконання
 
+### Код програми
+
+```c
+#include <stdio.h>
+
+void recursive_function(int depth) {
+    printf("Recursion depth: %d\n", depth);
+    recursive_function(depth + 1);
+}
+
+int main() {
+    printf("Starting recursive function...\n");
+    recursive_function(1);
+    return 0;
+}
+```
+
+Програма демонструє обмеження на максимальний розмір сегмента стека (`max stack segment size`) за допомогою рекурсивного виклику функції. Вона викликає сама себе, збільшуючи глибину рекурсії, поки не буде перевищено ліміт стека. У разі перевищення ліміту операційна система зазвичай генерує Segmentation fault або іншу відповідну помилку.
+
+Для перевірки обмеження перед запуском програми можна встановити максимальний розмір стека командою:
+
+```bash
+ulimit -s 64
+```
+
+### Результат виконання програми
+
+![](task6/task6_1.png)
+
+![](task6/task6_2.png)
+
 # Завдання 7 (варіант 20)
 
 ## Умова
