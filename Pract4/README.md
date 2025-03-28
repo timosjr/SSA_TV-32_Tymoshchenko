@@ -136,9 +136,9 @@ int main() {
     
     // Перевіряємо, чи malloc(0) повертає NULL або вказівник
     if (ptr0 == NULL) {
-        printf("malloc(0) повернув NULL\n");
+        printf("malloc(0) returned NULL\n");
     } else {
-        printf("malloc(0) повернув вказівник: %p\n", ptr0);
+        printf("malloc(0) returned pointer: %p\n", ptr0);
     }
 
     // Викликаємо malloc(3), що має виділити 3 байти
@@ -146,9 +146,9 @@ int main() {
     
     // Перевіряємо, чи malloc(3) повернув вказівник на пам'ять
     if (ptr3 == NULL) {
-        printf("malloc(3) повернув NULL\n");
+        printf("malloc(3) returned NULL\n");
     } else {
-        printf("malloc(3) повернув вказівник: %p\n", ptr3);
+        printf("malloc(3) returned pointer: %p\n", ptr3);
     }
 
     // Викликаємо free на ptr0 та ptr3, навіть якщо ptr0 може бути NULL
@@ -210,17 +210,17 @@ void example() {
         if (!ptr)
             ptr = malloc(n);  // Виділяємо пам'ять
         if (ptr == NULL) {
-            printf("Не вдалося виділити пам'ять!\n");
+            printf("Can not allocate memory\n");
             return;
         }
-        printf("Використовуємо пам'ять: %p\n", ptr);
+        printf("Using memory: %p\n", ptr);
         
         // Використовуємо пам'ять ptr
     }
 
     // Тепер можна звільнити пам'ять після завершення використання
     free(ptr);
-    printf("Пам'ять звільнена.\n");
+    printf("Memory free\n");
 }
 
 int main() {
@@ -262,13 +262,13 @@ void example() {
     // Імітуємо ситуацію, де realloc не може виділити пам'ять
     int *new_arr = realloc(arr, 1000000000 * sizeof(int));  // Спробуємо виділити занадто багато пам'яті
     if (new_arr == NULL) {
-        printf("Помилка realloc: не вдалося виділити пам'ять\n");
+        printf("Error realloc: can not allocate memory\n");
         free(arr);  // Звільняємо стару пам'ять
         return;
     }
 
     // Якщо realloc успішний
-    printf("Пам'ять успішно перевиділено\n");
+    printf("Memory allocated\n");
 
     free(new_arr);  // Звільняємо пам'ять
 }
@@ -307,18 +307,18 @@ int main() {
     // Викликаємо realloc з NULL (еквівалентно malloc)
     int *ptr = realloc(NULL, 5 * sizeof(int));
     if (ptr == NULL) {
-        printf("Не вдалося виділити пам'ять.\n");
+        printf("Can not allocate memory\n");
         return 1;
     } else {
-        printf("Пам'ять виділена успішно для 5 елементів.\n");
+        printf("Memory allocated\n");
     }
 
     // Викликаємо realloc з розміром 0 (еквівалентно free)
     int *temp = realloc(ptr, 0);
     if (temp == NULL) {
-        printf("Пам'ять успішно звільнена (temp == NULL).\n");
+        printf("Memory free\n");
     } else {
-        printf("Пам'ять не звільнена, temp != NULL.\n");
+        printf("Memory not free, temp != NULL.\n");
         // За допомогою temp перевірте, чи вона була перепризначена
         free(temp);  // Важливо: звільніть пам'ять після перевірки
     }
@@ -336,3 +336,169 @@ int main() {
 ### Результат роботи програми
 
 ![](task6/task6.png)
+
+# Завдання 7
+
+## Умова
+
+Перепишіть наступний код, використовуючи reallocarray(3):
+struct sbar *ptr, *newptr;
+ptr = calloc(1000, sizeof(struct sbar));
+newptr = realloc(ptr, 500*sizeof(struct sbar));
+
+
+Порівняйте результати виконання з використанням ltrace.
+
+
+## Виконання
+
+### Код програми
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+struct sbar {
+    int field1; // Приклад поля
+    float field2; // Приклад іншого поля
+};
+
+int main() {
+    struct sbar *ptr, *newptr;
+
+    // Виділяємо пам'ять для 1000 елементів структури
+    ptr = calloc(1000, sizeof(struct sbar));
+    if (ptr == NULL) {
+        // Якщо calloc не зміг виділити пам'ять
+        fprintf(stderr, "Error: can not allocate memory\n");
+        return 1;
+    }
+
+    // Виведемо для перевірки, що пам'ять виділена
+    printf("Memory for 1000 elements allocated succesfully\n");
+
+    // Використовуємо reallocarray для зміни розміру пам'яті
+    newptr = reallocarray(ptr, 500, sizeof(struct sbar));
+    if (newptr == NULL) {
+        // Якщо reallocarray не вдалося перевиділити пам'ять
+        fprintf(stderr, "Error: can not allocate memory\n");
+        free(ptr); // Звільняємо стару пам'ять
+        return 1;
+    }
+
+    // Виведемо для перевірки, що пам'ять була успішно перевиділена
+    printf("Memory for 500 elements allocated succesfully\n");
+
+    // Приклад використання пам'яті
+    newptr[0].field1 = 10;
+    newptr[0].field2 = 20.5f;
+
+    printf("field1 = %d, field2 = %.2f\n", newptr[0].field1, newptr[0].field2);
+
+    // Звільняємо пам'ять після використання
+    free(newptr);
+
+    return 0;
+}
+```
+
+### Пояснення
+
+Спочатку виділяється пам'ять для 1000 елементів структури `sbar` за допомогою `calloc`. Потім пам'ять перевиділяється для 500 елементів за допомогою `reallocarray`. Якщо виділення пам'яті не вдається, виводиться повідомлення про помилку і програма завершується. Це є прикладом того як можна використовувати виділену пам'ять.
+
+### Запуск програми без ltrace
+
+![](task7/task7.png)
+
+### Запуск програми з ltrace
+
+![](task7/task7_ltrace.png)
+
+З `ltrace` можна відстежити всі виклики бібліотечних функцій (`calloc`, `reallocarray`, `free`) та їхні аргументи.
+
+# Завдання 8 (варіант 20)
+
+## Умова
+
+Використайте pthreads для конкурентного доступу до heap та перевірте ефективність.
+
+## Виконання
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <time.h>
+
+#define NUM_THREADS 4
+#define NUM_OPERATIONS 1000000
+
+// Структура для кожного потоку
+typedef struct {
+    int id;
+    unsigned long *heap;
+} ThreadData;
+
+// Функція для виконання операцій на heap
+void *perform_operations(void *arg) {
+    ThreadData *data = (ThreadData *)arg;
+
+    for (int i = 0; i < NUM_OPERATIONS; ++i) {
+        data->heap[i % NUM_OPERATIONS] = i;
+    }
+
+    pthread_exit(NULL);
+}
+
+int main() {
+    pthread_t threads[NUM_THREADS];
+    ThreadData thread_data[NUM_THREADS];
+    unsigned long *heap = malloc(NUM_OPERATIONS * sizeof(unsigned long));
+    if (heap == NULL) {
+        perror("Failed to allocate heap memory");
+        return EXIT_FAILURE;
+    }
+
+    clock_t start = clock();
+
+    // Створення потоків
+    for (int i = 0; i < NUM_THREADS; ++i) {
+        thread_data[i].id = i;
+        thread_data[i].heap = heap;
+        if (pthread_create(&threads[i], NULL, perform_operations, (void *)&thread_data[i]) != 0) {
+            perror("Failed to create thread");
+            return EXIT_FAILURE;
+        }
+    }
+
+    // Очікування завершення потоків
+    for (int i = 0; i < NUM_THREADS; ++i) {
+        pthread_join(threads[i], NULL);
+    }
+
+    clock_t end = clock();
+    double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
+    printf("Time taken with pthreads: %f seconds\n", time_taken);
+
+    free(heap);
+    return EXIT_SUCCESS;
+}
+```
+
+### Пояснення
+
+`pthread` (POSIX Threads) — це стандартна бібліотека потоків для багатопотокового програмування в UNIX-подібних операційних системах, таких як FreeBSD, Linux та macOS. Вона дозволяє програмам створювати кілька потоків виконання всередині одного процесу, що може покращити продуктивність за певних умов.
+
+Коли створюється багато потоків, операційна система змушена часто перемикати контекст між ними (тобто зберігати та відновлювати стан регістрів, стеку, планувальника). Це дорого з точки зору продуктивності, оскільки витрачається час на сам процес перемикання. При збільшенні кількості потоків збільшується час, необхідний для виконання програми.
+
+### Результат з 1 потоком
+
+![](task8/task8_2.png)
+
+### Результат з 4 потоками
+
+![](task8/task8_1.png)
+
+### Результат з 100 потоків
+
+![](task8/task8_3.png)
