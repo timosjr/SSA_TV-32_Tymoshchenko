@@ -382,7 +382,7 @@ int main(int argc, char *argv[]) {
 
 ### Вихідний файл
 
-1[](task5/task5_file_destination.png)
+![](task5/task5_file_destination.png)
 
 # Завдання 6
 
