@@ -430,3 +430,50 @@ ulimit -s 64
 Написати програму, яка тестує вплив ulimit -r на пріоритети процесів.
 
 ## Виконання
+
+### Код програми
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <unistd.h>
+
+void run_process() {
+    while (1) {
+        // Нескінченний цикл для навантаження CPU
+    }
+}
+
+int main() {
+    printf("Testing ulimit -r impact on process priority...\n");
+    
+    for (int i = 0; i < 3; i++) {
+        pid_t pid = fork();
+        if (pid == 0) {
+            int priority = 0;
+            if (setpriority(PRIO_PROCESS, 0, priority) != 0) {
+                perror("Failed to set priority");
+            }
+            printf("Child process %d started with priority %d\n", getpid(), getpriority(PRIO_PROCESS, 0));
+            run_process();
+        }
+    }
+    
+    sleep(5); // Дати процесам час для виконання
+    return 0;
+}
+```
+
+Програма створює кілька процесів, які виконують нескінченний цикл, споживаючи процесорний час. Перед запуском програми можна обмежити максимальний пріоритет процесів через команду:
+
+```bash
+ulimit -r 10
+```
+
+### Результат виконання програми
+
+![](task7/task7_20.png)
+
+Програма запустилася, створила три дочірні процеси (1213, 1214, 1215). Усі дочірні процеси мають пріоритет 0, оскільки Пріоритет за замовчуванням у звичайних процесів за nice дорівнює 0. Навіть якщо спробувати підняти пріоритет, він може не змінитися через обмеження `ulimit -r`.
