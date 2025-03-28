@@ -5,26 +5,24 @@ void example() {
     void *ptr = NULL;
     int n = 10;
 
-    // Імітуємо деякі умови для циклу
     for (int i = 0; i < 3; i++) {
         if (!ptr)
-            ptr = malloc(n);  // Виділяємо пам'ять
+            ptr = malloc(n);
         if (ptr == NULL) {
-            printf("Не вдалося виділити пам'ять!\n");
+            printf("Can not allocate memory\n");
             return;
         }
-        printf("Використовуємо пам'ять: %p\n", ptr);
+        printf("Using memory: %p\n", ptr);
         
-        // Використовуємо пам'ять ptr
     }
 
-    // Тепер можна звільнити пам'ять після завершення використання
     free(ptr);
-    printf("Пам'ять звільнена.\n");
+    printf("Memory free\n");
 }
 
 int main() {
     example();
     return 0;
 }
+
 
