@@ -18,16 +18,30 @@
 | 6  | **Глобальний вихід за межі(global buffer overflow)**       | ```c\nextern char global[5]; char x = global[6];```                             | `global-buffer-overflow`, якщо глобальна змінна перевищена                                                | Під час виконання |
 | 7  | **Невірне звільнення (invalid free)** | ```c\nint a; free(&a);```                                                   | `attempting free on address which was not malloc()`                                                       | Під час виконання |
 
-### ![№1 Вихід за межі масиву (stack buffer overflow)](task20/ex1.png)
+### №1 Вихід за межі масиву (stack buffer overflow)
 
-### ![№2 Вихід за межі купи (heap buffer overflow)](task20/ex2.png)
+![](task20/ex1.png)
 
-### ![№3 Use-after-free](task20/ex3.png)
+### №2 Вихід за межі купи (heap buffer overflow)
 
-### ![№4 Double free](task20/ex4.png)
+![](task20/ex2.png)
 
-### ![№5 Stack use after return](task20/ex5.png)
+### №3 Use-after-free
 
-### ![№6 Глобальний вихід за межі(global buffer overflow)](task20/ex6.png)
+![](task20/ex3.png)
 
-### ![№7 Невірне звільнення (invalid free)](task20/ex7.png)
+### №4 Double free
+
+![](task20/ex4.png)
+
+### №5 Stack use after return
+
+![](task20/ex5.png)
+
+### №6 Глобальний вихід за межі(global buffer overflow)
+
+![](task20/ex6.png)
+
+### №7 Невірне звільнення (invalid free)
+
+![](task20/ex7.png)
