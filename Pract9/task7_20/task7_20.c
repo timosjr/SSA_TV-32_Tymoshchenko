@@ -11,6 +11,3 @@ int main() {
 
     return 0;
 }
-
-
-USER=otheruser HOME=/home/otheruser LOGNAME=otheruser ./check_user
