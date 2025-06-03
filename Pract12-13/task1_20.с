@@ -1,0 +1,52 @@
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <setjmp.h>
+#include <ucontext.h>
+
+static sigjmp_buf jump_buffer;
+
+void segfault_handler(int sig, siginfo_t *info, void *ucontext) {
+	printf("Caught signal %d (SIGSEGV) at address: %p\n", sig, info->si_addr);
+
+    	// Друкуємо значення регістрів (x86_64 приклад)
+    	ucontext_t *ctx = (ucontext_t *)ucontext;
+
+#if defined(__x86_64__)
+    	printf("RIP = %llx\n", (unsigned long long)ctx->uc_mcontext.mc_rip);
+	printf("RSP = %llx\n", (unsigned long long)ctx->uc_mcontext.mc_rsp);
+#endif
+
+    	// Відкат до безпечної точки
+    	printf("Rolling back to safe point...\n");
+    	siglongjmp(jump_buffer, 1);
+}
+
+void cause_segfault() {
+    	int *p = NULL;
+    	*p = 42; // Викликає SIGSEGV
+}
+
+int main() {
+    	struct sigaction sa;
+
+    	sa.sa_sigaction = segfault_handler;
+    	sigemptyset(&sa.sa_mask);
+    	sa.sa_flags = SA_SIGINFO;
+
+    	if (sigaction(SIGSEGV, &sa, NULL) == -1) {
+    	    	perror("sigaction");
+        	exit(EXIT_FAILURE);
+    	}
+
+    	if (sigsetjmp(jump_buffer, 1) == 0) {
+        	printf("Setting safe point...\n");
+        	cause_segfault();
+    	} else {
+        	printf("Successfully rolled back from segfault!\n");
+    	}
+
+    	printf("Program continues safely.\n");
+    	return 0;
+}
